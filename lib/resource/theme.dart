@@ -7,16 +7,4 @@ import 'dimens.dart';
 var lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: HexColor("1FB0E6"),
-    textTheme: TextTheme(
-      bodyMedium: TextStyle(
-          color: HexColor("#2D3142"),
-          fontSize: textFontSize_14,
-          fontStyle: FontStyle.normal,
-          fontWeight: FontWeight.bold),
-        headline1: TextStyle(
-            color: HexColor("#2D3142"),
-            fontSize: textFontSize_14,
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.bold)
-
-    ));
+  );

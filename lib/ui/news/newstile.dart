@@ -69,7 +69,10 @@ class NewsTileState extends State<NewsTile> {
                 color: HexColor('#DFDFDF'),
                 child: const Text(
                   AppConstants.viewReplies,
-                  //  style:ThemeData.light().textTheme.bodyMedium,
+                    style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500)
                 ),
               ),
             )
