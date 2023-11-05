@@ -1,3 +1,6 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'constants.dart';
@@ -28,4 +31,18 @@ Future<int> getTotalResults(int total) async {
   int allNews = (prefs.getInt(AppConstants.totalNewsRetrieved)?.toInt()) ?? 0;
   allNews = total + allNews;
   return allNews;
+}
+
+Future<bool> checkPermission()async{
+  bool isPermissionGranted =false;
+  if (!kIsWeb) {
+    var status = await Permission.microphone.request();
+
+    if (status != PermissionStatus.granted) {
+      throw RecordingPermissionException('Microphone permission not granted');
+    }else{
+      isPermissionGranted = true;
+    }
+  }
+  return isPermissionGranted;
 }

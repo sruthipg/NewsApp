@@ -3,10 +3,12 @@ import 'package:top_news_app/utils/constants.dart';
 class Comment {
   String newsId;
   String audioUrl;
+  bool isPlaying;
 
   //When using curly braces { } we note dart that
   //the parameters are optional
-  Comment({required this.newsId, required this.audioUrl});
+  Comment(
+      {required this.newsId, required this.audioUrl, this.isPlaying = false});
 
   factory Comment.fromDatabaseJson(Map<String, dynamic> data) => Comment(
       //Factory method will be used to convert JSON objects that

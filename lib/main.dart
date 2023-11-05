@@ -17,6 +17,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     // ScreenUtilInit is used for adapting screen and font size

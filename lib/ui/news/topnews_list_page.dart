@@ -11,6 +11,7 @@ import 'package:top_news_app/ui/news/newstile.dart';
 import 'package:top_news_app/utils/constants.dart';
 
 import '../../bloc/news/news_state.dart';
+import '../../utils/commomutils.dart';
 
 // Widget for displaying TopNews
 class TopNewsList extends StatefulWidget {
@@ -20,6 +21,11 @@ class TopNewsList extends StatefulWidget {
 
 class _TopNewsListViewState extends State<TopNewsList> {
 // Update the time and check for results if required
+  @override
+  void initState()  {
+    checkPermission();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +44,7 @@ class _TopNewsListViewState extends State<TopNewsList> {
           BlocProvider<AudioCommentsBloc>(
             create: (context) =>
                 AudioCommentsBloc()..add(FetchAudioComments(id: '')),
-          )
+          ),
         ],
         child: newsListWidget(),
       ),

@@ -24,10 +24,15 @@ class AudioCommentsError extends AudioCommentsState {
   AudioCommentsError({required this.message});
 }
 
-// Not using can use in better logic
-class AudioPlayState extends AudioCommentsState {
-  bool isPlaying = false;
-  String url;
+class RecordingState extends AudioCommentsState {}
 
-  AudioPlayState({required this.isPlaying, required this.url});
-}
+class InitialRecordState extends AudioCommentsState {}
+
+class IdleRecordState extends AudioCommentsState {}
+
+
+class PlayingState extends AudioCommentsState {}
+
+class InitialPlayState extends AudioCommentsState {}
+
+class IdlePlayState extends AudioCommentsState {}
