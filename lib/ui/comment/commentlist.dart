@@ -44,13 +44,10 @@ class CommentListState extends State<CommentList> {
           listener: (context, state) {},
           builder: (context, state) {
             if (state is AudioCommentLoadingState) {
-              print("AudioCommentLoadingState");
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsLoaded) {
-              print("AudioCommentsLoaded");
               comments =[];
               comments = (state.comments ?? []);
-              print(comments.length);
               if (comments.isNotEmpty) {
                 return Container(
                   decoration: const BoxDecoration(
@@ -70,11 +67,9 @@ class CommentListState extends State<CommentList> {
                 return const Center(child: Text(AppConstants.noData));
               }
             } else if (state is AudioCommentsAdded) {
-              print("AudioCommentsAdded");
               _audioCommentBloc.add(FetchAudioComments(id: widget.sourceID));
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsError) {
-              print("AudioCommentsError");
               return Center(
                   child: Text('${AppConstants.loadFailed}: ${state.message}'));
             } //Player Stopped
@@ -95,8 +90,6 @@ class CommentListState extends State<CommentList> {
 
   // List tile for Audio comments
   Widget commentTile(String audioUrl, int index) {
-    print("CommentTile $audioUrl");
-    print("CommentTile $index");
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(
@@ -120,7 +113,6 @@ class CommentListState extends State<CommentList> {
                 bool isUrlExists =
                     await checkUrlExists(comments[index].audioUrl);
                 if (isUrlExists) {
-                  print("IsUrlExists $isUrlExists");
                   comments[index].isPlaying = !comments[index].isPlaying;
                   if (comments[index].isPlaying) {
                     playAudio(comments[index].audioUrl, index);
@@ -172,7 +164,6 @@ class CommentListState extends State<CommentList> {
 
   // Function to save the audio file to database
   void saveFileToDb() {
-    print("saveFileToDb");
     Comment comment = Comment(newsId: widget.sourceID, audioUrl: _mPath);
     _audioCommentBloc.add(AddAudioComment(comment: comment));
   }
@@ -180,27 +171,22 @@ class CommentListState extends State<CommentList> {
   // Start and Stop record
 
   void stopRecord() {
-    print(" stopRecord Recording: $_isRecording");
     _audioCommentBloc.add(StopRecordingEvent());
   }
 
   void recordAudio() async {
-    print(" recordAudio  Record: $_isRecording");
     final tempDir = await getApplicationCacheDirectory();
     _mPath = await getFilePathMp4();
     _mPath = '${tempDir.path}/$_mPath';
-    print("recordAudio : $_mPath");
     _audioCommentBloc.add(StartRecordingEvent(fileName: _mPath));
   }
 
 // Start and Stop play
   void playAudio(String audioUrl, int index) async {
-    print(" playAudio  Playing: $audioUrl");
     _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
   }
 
   void stopPlay() {
-    print(" stopPlay Playing : ");
     _audioCommentBloc.add(StopPlayingEvent());
   }
 }

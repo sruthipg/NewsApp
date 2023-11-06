@@ -34,7 +34,6 @@ class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
     });
 // Fetch the comments
     if (event is FetchAudioComments) {
-      print("FetchAudioComments");
       yield AudioCommentLoadingState();
       try {
         List<Comment> audioComments = [];
@@ -46,7 +45,6 @@ class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
     }
     // When new comment is added
     if (event is AddAudioComment) {
-      print("AddAudioComment");
       yield AudioCommentLoadingState();
       try {
         await _repository.saveAudioComment(event.comment);
@@ -59,14 +57,12 @@ class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
     // Start Record
     if (event is StartRecordingEvent) {
       try {
-        print("StartRecordingEvent");
         await _recorder.startRecorder(
           toFile: event.fileName,
           codec: _codec,
           audioSource: AppConstants.theSource,
         );
         _recorder.onProgress!.listen((audioData) {
-          print("StartRecordingEvent $audioData");
           if (event == _recorder.isStopped) {
             add(StopRecordingEvent());
           }
@@ -76,19 +72,15 @@ class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
         print('Error starting recording: $error');
       }
     } else if (event is StopRecordingEvent) {
-      print("StopRecordingEvent");
       await _recorder.stopRecorder();
       yield IdleRecordState();
     }
     // Play the audiofile
     if (event is StartPlayingEvent) {
-      print("StartPlayingEvent");
       try {
         await _player.startPlayer(fromURI: event.audioFilePath);
         _player.onProgress!.listen((state) {
-          print("StartPlayingEvent: $state");
           if (state == PlayerState.isStopped) {
-            print("StartPlayingEvent: PlayingStopped");
             add(StopPlayingEvent());
           }
         });
@@ -97,7 +89,6 @@ class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
         print('Error starting playback: $error');
       }
     } else if (event is StopPlayingEvent) {
-      print("StopPlayingEvent");
       _player.stopPlayer();
       yield IdlePlayState();
     }
