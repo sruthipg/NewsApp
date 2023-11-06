@@ -66,7 +66,7 @@ class CommentListState extends State<CommentList> {
                   child: ListView.builder(
                     itemCount: comments.length,
                     itemBuilder: (context, index) {
-                      return CommentTile(comments[index].audioUrl ?? '', index);
+                      return commentTile(comments[index].audioUrl ?? '', index);
                     },
                   ),
                 );
@@ -84,7 +84,7 @@ class CommentListState extends State<CommentList> {
             } else if (state is IdlePlayState) {
               print("IdlePlayState");
               _isPlaying = !_isPlaying;
-             // comments[index].isPlaying = !comments[index].isPlaying;
+              // comments[index].isPlaying = !comments[index].isPlaying;
               return Container();
             } else if (state is IdleRecordState) {
               print("IdleRecordState");
@@ -95,42 +95,12 @@ class CommentListState extends State<CommentList> {
               return const Center(child: Text(AppConstants.noData));
             }
           }),
-      Positioned(
-        left: dimen_0,
-        right: dimen_0,
-        bottom: dimen_0,
-        child: Container(
-          padding: const EdgeInsets.all(dimen_16),
-          child: ElevatedButton(
-            onPressed: () {
-              setState(() {
-                //Save file
-                _isRecording = !_isRecording;
-                recordAudio();
-              });
-            },
-            child: Text(
-                // Change the text based if record started
-                _isRecording
-                    ? AppConstants.stopRecordComment
-                    : AppConstants.startRecordComment,
-                style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: textFontSize_14,
-                    fontWeight: FontWeight.w500)),
-          ),
-        ),
-      ),
+      recordWidget(),
     ]);
   }
 
-  void saveFileToDb() {
-    print("saveFileToDb");
-    Comment comment = Comment(newsId: widget.sourceID, audioUrl: _mPath);
-    _audioCommentBloc.add(AddAudioComment(comment: comment));
-  }
-
-  Widget CommentTile(String audioUrl, int index) {
+  // List tile for Audio comments
+  Widget commentTile(String audioUrl, int index) {
     print("CommentTile $audioUrl");
     print("CommentTile $index");
     return Container(
@@ -164,6 +134,44 @@ class CommentListState extends State<CommentList> {
     );
   }
 
+  // Widget for record the audio file
+  Widget recordWidget() {
+    return Positioned(
+      left: dimen_0,
+      right: dimen_0,
+      bottom: dimen_0,
+      child: Container(
+        padding: const EdgeInsets.all(dimen_16),
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              //Save file
+              _isRecording = !_isRecording;
+              recordAudio();
+            });
+          },
+          child: Text(
+              // Change the text based if record started
+              _isRecording
+                  ? AppConstants.stopRecordComment
+                  : AppConstants.startRecordComment,
+              style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: textFontSize_14,
+                  fontWeight: FontWeight.w500)),
+        ),
+      ),
+    );
+  }
+
+  // Function to save the audio file to database
+  void saveFileToDb() {
+    print("saveFileToDb");
+    Comment comment = Comment(newsId: widget.sourceID, audioUrl: _mPath);
+    _audioCommentBloc.add(AddAudioComment(comment: comment));
+  }
+
+  // Start and Stop record
   void recordAudio() async {
     await checkPermission();
     if (!_isPlaying) {
@@ -185,6 +193,7 @@ class CommentListState extends State<CommentList> {
     }
   }
 
+// Start and Stop play
   void playAudio(String audioUrl, int index) async {
     await checkPermission();
     if (!_isRecording) {
@@ -202,5 +211,4 @@ class CommentListState extends State<CommentList> {
       _audioCommentBloc.add(StopRecordingEvent());
     }
   }
-
 }
