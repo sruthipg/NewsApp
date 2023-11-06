@@ -24,7 +24,6 @@ class CommentList extends StatefulWidget {
 }
 
 class CommentListState extends State<CommentList> {
-  bool _isPlaying = false;
   bool _isRecording = false;
   String _mPath = '';
   int selectedIndex = -1;
@@ -49,6 +48,7 @@ class CommentListState extends State<CommentList> {
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsLoaded) {
               print("AudioCommentsLoaded");
+              comments =[];
               comments = (state.comments ?? []);
               print(comments.length);
               if (comments.isNotEmpty) {
@@ -122,8 +122,7 @@ class CommentListState extends State<CommentList> {
                 if (isUrlExists) {
                   print("IsUrlExists $isUrlExists");
                   comments[index].isPlaying = !comments[index].isPlaying;
-                  _isPlaying = !_isPlaying;
-                  if (_isPlaying) {
+                  if (comments[index].isPlaying) {
                     playAudio(comments[index].audioUrl, index);
                   } else {
                     stopPlay();
@@ -196,13 +195,12 @@ class CommentListState extends State<CommentList> {
 
 // Start and Stop play
   void playAudio(String audioUrl, int index) async {
-    print(" playAudio  Playing: $_isPlaying $audioUrl");
-    comments[selectedIndex].isPlaying = true;
+    print(" playAudio  Playing: $audioUrl");
     _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
   }
 
   void stopPlay() {
-    print(" stopPlay Playing : $_isPlaying");
+    print(" stopPlay Playing : ");
     _audioCommentBloc.add(StopPlayingEvent());
   }
 }
