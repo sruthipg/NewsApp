@@ -1,3 +1,5 @@
+import 'package:flutter_sound_platform_interface/flutter_sound_recorder_platform_interface.dart';
+
 class AppConstants {
   static const String appName = "Top News";
   static const String url =
@@ -19,4 +21,6 @@ class AppConstants {
   static const String loadSuccess = 'Loaded Successfully';
   static const String loadFailed = 'Failed to load news';
   static const String noData = 'No data found';
+
+  static const theSource = AudioSource.microphone;
 }

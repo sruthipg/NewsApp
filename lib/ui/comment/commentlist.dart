@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:top_news_app/bloc/comments/audiocomment_bloc.dart';
+import 'package:top_news_app/ui/comment/playpausebutton.dart';
 import 'package:top_news_app/utils/constants.dart';
 import '../../bloc/comments/audiocomment_event.dart';
 import '../../bloc/comments/audiocomment_state.dart';
@@ -24,12 +26,12 @@ class CommentListState extends State<CommentList> {
   bool _isPlaying = false;
   bool _isRecording = false;
   String _mPath = '';
+  int selectedIndex = -1;
   final AudioCommentsBloc _audioCommentBloc = AudioCommentsBloc();
   List<Comment> comments = [];
 
   @override
   void initState() {
-    checkPermission();
     _audioCommentBloc.add(FetchAudioComments(id: widget.sourceID));
     super.initState();
   }
@@ -47,9 +49,12 @@ class CommentListState extends State<CommentList> {
           listener: (context, state) {},
           builder: (context, state) {
             if (state is AudioCommentLoadingState) {
+              print("AudioCommentLoadingState");
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsLoaded) {
+              print("AudioCommentsLoaded");
               comments = (state.comments ?? []);
+              print(comments.length);
               if (comments.isNotEmpty) {
                 return Container(
                   decoration: const BoxDecoration(
@@ -69,16 +74,22 @@ class CommentListState extends State<CommentList> {
                 return const Center(child: Text(AppConstants.noData));
               }
             } else if (state is AudioCommentsAdded) {
+              print("AudioCommentsAdded");
               _audioCommentBloc.add(FetchAudioComments(id: widget.sourceID));
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsError) {
+              print("AudioCommentsError");
               return Center(
                   child: Text('${AppConstants.loadFailed}: ${state.message}'));
             } else if (state is IdlePlayState) {
+              print("IdlePlayState");
               _isPlaying = !_isPlaying;
+             // comments[index].isPlaying = !comments[index].isPlaying;
               return Container();
             } else if (state is IdleRecordState) {
+              print("IdleRecordState");
               _isRecording = !_isRecording;
+              saveFileToDb();
               return Container();
             } else {
               return const Center(child: Text(AppConstants.noData));
@@ -94,6 +105,7 @@ class CommentListState extends State<CommentList> {
             onPressed: () {
               setState(() {
                 //Save file
+                _isRecording = !_isRecording;
                 recordAudio();
               });
             },
@@ -113,11 +125,14 @@ class CommentListState extends State<CommentList> {
   }
 
   void saveFileToDb() {
+    print("saveFileToDb");
     Comment comment = Comment(newsId: widget.sourceID, audioUrl: _mPath);
     _audioCommentBloc.add(AddAudioComment(comment: comment));
   }
 
   Widget CommentTile(String audioUrl, int index) {
+    print("CommentTile $audioUrl");
+    print("CommentTile $index");
     return Container(
       decoration: const BoxDecoration(
         borderRadius: BorderRadius.vertical(
@@ -133,20 +148,14 @@ class CommentListState extends State<CommentList> {
           const SizedBox(width: dimen_16),
           // Add spacing between avatar and audio button
           // Audio Play Button
-          IconButton(
-            style: ButtonStyle(
-              padding: MaterialStateProperty.all<EdgeInsetsGeometry>(
-                const EdgeInsets.all(8),
-              ),
-            ),
-            //Change the icon is playing
-            icon: _isPlaying
-                ? const Icon(Icons.pause)
-                : const Icon(Icons.play_arrow),
-            iconSize: playerIconSize,
+          PlayPauseButton(
+            isPlaying: comments[index].isPlaying,
             onPressed: () {
+              // Toggle play/pause state for the clicked item
               setState(() {
-                playAudio(audioUrl, index);
+                comments[index].isPlaying = !comments[index].isPlaying;
+                _isPlaying = !_isPlaying;
+                playAudio(comments[index].audioUrl, index);
               });
             },
           ),
@@ -157,30 +166,41 @@ class CommentListState extends State<CommentList> {
 
   void recordAudio() async {
     await checkPermission();
-    _isRecording = !_isRecording;
-    if (_isRecording) {
-      _mPath = await getFilePathMp4();
-      _audioCommentBloc.add(StartRecordingEvent(fileName: _mPath));
+    if (!_isPlaying) {
+      print(" recordAudio Playing : $_isPlaying");
+      if (_isRecording) {
+        print(" recordAudio  Record: $_isRecording");
+        final tempDir = await getApplicationCacheDirectory();
+        _mPath = await getFilePathMp4();
+        _mPath = '${tempDir.path}/$_mPath';
+        print("recordAudio : $_mPath");
+        _audioCommentBloc.add(StartRecordingEvent(fileName: _mPath));
+      } else {
+        print(" recordAudio Record: $_isRecording");
+        _audioCommentBloc.add(StopRecordingEvent());
+      }
     } else {
-      _audioCommentBloc.add(StopRecordingEvent());
+      print(" recordAudio  Playing: $_isPlaying");
+      _audioCommentBloc.add(StopPlayingEvent());
     }
   }
 
   void playAudio(String audioUrl, int index) async {
     await checkPermission();
-    _isPlaying = !_isPlaying;
-    comments = await List.generate(
-      5, // Replace with the desired number of items
-      (index) => Comment(
-          isPlaying: false,
-          audioUrl: comments[index].audioUrl,
-          newsId: comments[index].newsId),
-    );
-    if (_isPlaying) {
-      comments[index].isPlaying = true;
-      _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
+    if (!_isRecording) {
+      print(" playAudio Record: $_isRecording");
+      if (_isPlaying) {
+        print(" playAudio  Playing: $_isPlaying $audioUrl");
+        comments[selectedIndex].isPlaying = true;
+        _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
+      } else {
+        print(" playAudio Playing : $_isPlaying");
+        _audioCommentBloc.add(StopPlayingEvent());
+      }
     } else {
-      _audioCommentBloc.add(StopPlayingEvent());
+      print(" playAudio Record: $_isRecording");
+      _audioCommentBloc.add(StopRecordingEvent());
     }
   }
+
 }

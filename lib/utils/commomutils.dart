@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -45,4 +47,13 @@ Future<bool> checkPermission()async{
     }
   }
   return isPermissionGranted;
+}
+Future<bool> checkUrlExists(String path) async {
+  var file = File(path);
+  var isFileExists = await file.exists();
+  if (isFileExists) {
+    return true;
+  } else {
+    return false;
+  }
 }

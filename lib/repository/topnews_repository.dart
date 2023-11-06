@@ -25,7 +25,6 @@ class TopNewsRepository {
       final news = json.decode(response.body);
       final News newsData = News.fromJson(news);
       int total = await getTotalResults(newsData.totalResults);
-      print("Total : $total");
       await prefs.setInt(AppConstants.totalNewsRetrieved, total);
       return newsData;
     } else {

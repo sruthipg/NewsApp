@@ -32,8 +32,6 @@ dependencies:
     sdk: flutter
   flutter_screenutil: ^5.9.0
   http: ^0.13.1
-  get: ^4.6.6
-  get_storage: ^2.1.1
  # flutter_audio_recorder: ^0.5.5
   flutter_background_service: ^5.0.2
   flutter_local_notifications: ^16.1.0
@@ -43,13 +41,10 @@ dependencies:
   permission_handler: ^6.0.1
   device_info_plus: ^9.1.0
   shared_preferences: ^2.2.2
-  android_intent: ^2.0.0
-  android_alarm_manager_plus: ^3.0.3
   flutter_sound: ^9.2.13
   sqflite: ^2.0.0
   path: ^1.6.4
   intl: ^0.17.0
-  just_audio: ^0.9.11
   audio_session: ^0.1.6
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
