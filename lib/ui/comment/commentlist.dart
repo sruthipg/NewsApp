@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:top_news_app/bloc/comments/audiocomment_bloc.dart';
 import 'package:top_news_app/ui/comment/playpausebutton.dart';
@@ -61,7 +62,6 @@ class CommentListState extends State<CommentList> {
                   child: Text('${AppConstants.loadFailed}: ${state.message}'));
             } //Player Stopped
             else if (state is IdlePlayState) {
-              // comments[index].isPlaying = !comments[index].isPlaying;
               return loadComments(comments);
             } //Recording stopped
             else if (state is RecordingState) {
@@ -75,6 +75,7 @@ class CommentListState extends State<CommentList> {
               return const Center(child: Text(AppConstants.noData));
             }
           }),
+      //
       recordWidget(),
     ]);
   }
@@ -188,7 +189,9 @@ class CommentListState extends State<CommentList> {
           top: Radius.circular(cornerRadius),
         ),
       ),
-      margin: const EdgeInsets.symmetric(vertical: dimen_16),
+      // just provided a fixed margin not the right solution.
+      margin: const EdgeInsets.only(bottom: 80),
+
       child: ListView.builder(
         itemCount: comments.length,
         itemBuilder: (context, index) {
