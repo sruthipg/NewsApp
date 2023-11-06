@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:top_news_app/bloc/comments/audiocomment_bloc.dart';
 import 'package:top_news_app/ui/comment/playpausebutton.dart';
 import 'package:top_news_app/utils/constants.dart';
+
 import '../../bloc/comments/audiocomment_event.dart';
 import '../../bloc/comments/audiocomment_state.dart';
 import '../../model/comment/comment.dart';
@@ -34,11 +35,6 @@ class CommentListState extends State<CommentList> {
   void initState() {
     _audioCommentBloc.add(FetchAudioComments(id: widget.sourceID));
     super.initState();
-  }
-
-  @override
-  void setState(VoidCallback fn) {
-    super.setState(fn);
   }
 
   @override
@@ -122,10 +118,15 @@ class CommentListState extends State<CommentList> {
             isPlaying: comments[index].isPlaying,
             onPressed: () {
               // Toggle play/pause state for the clicked item
-              setState(() {
-                comments[index].isPlaying = !comments[index].isPlaying;
-                _isPlaying = !_isPlaying;
-                playAudio(comments[index].audioUrl, index);
+              setState(() async {
+                bool isUrlExists =
+                    await checkUrlExists(comments[index].audioUrl);
+                if (isUrlExists) {
+                  print("IsUrlExists $isUrlExists");
+                  comments[index].isPlaying = !comments[index].isPlaying;
+                  _isPlaying = !_isPlaying;
+                  playAudio(comments[index].audioUrl, index);
+                }
               });
             },
           ),

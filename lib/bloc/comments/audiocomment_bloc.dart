@@ -2,13 +2,14 @@ import 'package:audio_session/audio_session.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_sound/flutter_sound.dart';
-import 'package:flutter_sound/public/flutter_sound_player.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:top_news_app/bloc/comments/audiocomment_event.dart';
 import 'package:top_news_app/bloc/comments/audiocomment_state.dart';
 import 'package:top_news_app/repository/audiocomment_repository.dart';
 import 'package:top_news_app/utils/constants.dart';
+
 import '../../model/comment/comment.dart';
+import '../../utils/commomutils.dart';
 
 class AudioCommentsBloc extends Bloc<AudioCommentsEvent, AudioCommentsState> {
   final AudioCommentRepository _repository = AudioCommentRepository();
