@@ -46,7 +46,7 @@ class CommentListState extends State<CommentList> {
             if (state is AudioCommentLoadingState) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is AudioCommentsLoaded) {
-              comments =[];
+              comments = [];
               comments = (state.comments ?? []);
               if (comments.isNotEmpty) {
                 return Container(
