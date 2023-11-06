@@ -49,20 +49,7 @@ class CommentListState extends State<CommentList> {
               comments = [];
               comments = (state.comments ?? []);
               if (comments.isNotEmpty) {
-                return Container(
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(cornerRadius),
-                    ),
-                  ),
-                  margin: const EdgeInsets.symmetric(vertical: dimen_16),
-                  child: ListView.builder(
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      return commentTile(comments[index].audioUrl ?? '', index);
-                    },
-                  ),
-                );
+                return loadComments(comments);
               } else {
                 return const Center(child: Text(AppConstants.noData));
               }
@@ -75,9 +62,13 @@ class CommentListState extends State<CommentList> {
             } //Player Stopped
             else if (state is IdlePlayState) {
               // comments[index].isPlaying = !comments[index].isPlaying;
-              return Container();
+              return loadComments(comments);
             } //Recording stopped
-            else if (state is IdleRecordState) {
+            else if (state is RecordingState) {
+              return loadComments(comments);
+            } else if (state is PlayingState) {
+              return loadComments(comments);
+            } else if (state is IdleRecordState) {
               saveFileToDb();
               return Container();
             } else {
@@ -188,5 +179,22 @@ class CommentListState extends State<CommentList> {
 
   void stopPlay() {
     _audioCommentBloc.add(StopPlayingEvent());
+  }
+
+  Widget loadComments(List<Comment> comments) {
+    return Container(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(cornerRadius),
+        ),
+      ),
+      margin: const EdgeInsets.symmetric(vertical: dimen_16),
+      child: ListView.builder(
+        itemCount: comments.length,
+        itemBuilder: (context, index) {
+          return commentTile(comments[index].audioUrl ?? '', index);
+        },
+      ),
+    );
   }
 }
