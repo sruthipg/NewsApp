@@ -77,14 +77,12 @@ class CommentListState extends State<CommentList> {
               print("AudioCommentsError");
               return Center(
                   child: Text('${AppConstants.loadFailed}: ${state.message}'));
-            } else if (state is IdlePlayState) {
-              print("IdlePlayState");
-              _isPlaying = !_isPlaying;
+            } //Player Stopped
+            else if (state is IdlePlayState) {
               // comments[index].isPlaying = !comments[index].isPlaying;
               return Container();
-            } else if (state is IdleRecordState) {
-              print("IdleRecordState");
-              _isRecording = !_isRecording;
+            } //Recording stopped
+            else if (state is IdleRecordState) {
               saveFileToDb();
               return Container();
             } else {
@@ -125,7 +123,11 @@ class CommentListState extends State<CommentList> {
                   print("IsUrlExists $isUrlExists");
                   comments[index].isPlaying = !comments[index].isPlaying;
                   _isPlaying = !_isPlaying;
-                  playAudio(comments[index].audioUrl, index);
+                  if (_isPlaying) {
+                    playAudio(comments[index].audioUrl, index);
+                  } else {
+                    stopPlay();
+                  }
                 }
               });
             },
@@ -148,7 +150,11 @@ class CommentListState extends State<CommentList> {
             setState(() {
               //Save file
               _isRecording = !_isRecording;
-              recordAudio();
+              if (_isRecording) {
+                recordAudio();
+              } else {
+                stopRecord();
+              }
             });
           },
           child: Text(
@@ -173,43 +179,30 @@ class CommentListState extends State<CommentList> {
   }
 
   // Start and Stop record
+
+  void stopRecord() {
+    print(" stopRecord Recording: $_isRecording");
+    _audioCommentBloc.add(StopRecordingEvent());
+  }
+
   void recordAudio() async {
-    await checkPermission();
-    if (!_isPlaying) {
-      print(" recordAudio Playing : $_isPlaying");
-      if (_isRecording) {
-        print(" recordAudio  Record: $_isRecording");
-        final tempDir = await getApplicationCacheDirectory();
-        _mPath = await getFilePathMp4();
-        _mPath = '${tempDir.path}/$_mPath';
-        print("recordAudio : $_mPath");
-        _audioCommentBloc.add(StartRecordingEvent(fileName: _mPath));
-      } else {
-        print(" recordAudio Record: $_isRecording");
-        _audioCommentBloc.add(StopRecordingEvent());
-      }
-    } else {
-      print(" recordAudio  Playing: $_isPlaying");
-      _audioCommentBloc.add(StopPlayingEvent());
-    }
+    print(" recordAudio  Record: $_isRecording");
+    final tempDir = await getApplicationCacheDirectory();
+    _mPath = await getFilePathMp4();
+    _mPath = '${tempDir.path}/$_mPath';
+    print("recordAudio : $_mPath");
+    _audioCommentBloc.add(StartRecordingEvent(fileName: _mPath));
   }
 
 // Start and Stop play
   void playAudio(String audioUrl, int index) async {
-    await checkPermission();
-    if (!_isRecording) {
-      print(" playAudio Record: $_isRecording");
-      if (_isPlaying) {
-        print(" playAudio  Playing: $_isPlaying $audioUrl");
-        comments[selectedIndex].isPlaying = true;
-        _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
-      } else {
-        print(" playAudio Playing : $_isPlaying");
-        _audioCommentBloc.add(StopPlayingEvent());
-      }
-    } else {
-      print(" playAudio Record: $_isRecording");
-      _audioCommentBloc.add(StopRecordingEvent());
-    }
+    print(" playAudio  Playing: $_isPlaying $audioUrl");
+    comments[selectedIndex].isPlaying = true;
+    _audioCommentBloc.add(StartPlayingEvent(audioFilePath: audioUrl));
+  }
+
+  void stopPlay() {
+    print(" stopPlay Playing : $_isPlaying");
+    _audioCommentBloc.add(StopPlayingEvent());
   }
 }
